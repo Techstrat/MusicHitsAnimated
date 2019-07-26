@@ -6,21 +6,28 @@ library(data.table)
 #use geom_tile for animated bars, since it allows you to slide positions.
 
 #Read from file
-ahits.dt <- readtext("weeklyhits.csv", encoding = "utf-8") 
+ahits.dt <- as.data.table(readtext("weeklyhits.csv", encoding = "utf-8")) 
 
 #select required columns
 ahits.dt <- ahits.dt[,.SD,.SDcols = c(3,5,6,8)]
+
+#mark the number 1 hits
+No1 <- unique(ahits.dt[ahits.dt$Pos=='1',c(3)])
+No1$Top <- "  # 1 hit"
+ahits.dt <- merge(ahits.dt,No1,by = "Song", all.x = TRUE)
+ahits.dt[is.na(ahits.dt$Top)]$Top<- " "
+
 ahits.dt <- filter(ahits.dt, hit_week>as.POSIXct("1965-08-01"))
-ahits.dt <- filter(ahits.dt, hit_week<as.POSIXct("1975-08-01"))
+ahits.dt <- filter(ahits.dt, hit_week<as.POSIXct("1966-01-01"))
 #ahits.dt <- filter(ahits.dt, Pos <=10)
 
 # Animation
-anim <- ggplot(ahits.dt, aes(Pos, group = Song, 
-                                  fill = as.factor(Song), color = as.factor(Song))) +
-   geom_tile(aes(y = Weeks/2,
-                 height = Weeks,
+anim <- ggplot(ahits.dt, aes(Pos, group = Song 
+                           ,fill = as.factor(Song), color = as.factor(Song))) +
+   geom_tile(aes(y = Weeks/2, height = Weeks,
                  width = 0.9), alpha = 0.8, color = NA) +
-   geom_text(aes(y = 0, label = paste(Song, " ")), vjust = 1, hjust = 1) +
+   geom_text(aes(y = 0, label = paste(Song, " ")), vjust = 1, hjust = 1, size = 6) +
+   geom_text(aes(y = 0, label = paste(Top," ")), vjust = 1, hjust = 0, color="red") +
    geom_text(aes(y = Weeks,label = Weeks, hjust=0)) +
    coord_flip(clip = "off", expand = FALSE) +
    scale_y_continuous(labels = scales::comma) +
@@ -56,6 +63,6 @@ anim <- ggplot(ahits.dt, aes(Pos, group = Song,
 
 # To get animation effect calculate frames:  
 # (number of data snapshots -1) multiply with 20 
-# Top 20 - so just take observasions minus 20
-animate(anim, nframes = 10380, fps = 10, width = 1200, height = 1000, 
+# Top 20 - so just take obs minus 20
+animate(anim, nframes = 400, fps = 10, width = 1200, height = 1000, 
         renderer = gifski_renderer("gganimhits.gif"))  
