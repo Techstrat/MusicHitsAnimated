@@ -2,12 +2,10 @@ library(readtext)
 library(tidyverse)
 library(gganimate)
 library(data.table)
-theme_set(theme_classic())
 #use geom_tile for animated bars, since it allows you to slide positions.
 
-file_dir <- "H:/Techstrat/Projects/Created/Music web scraping"
 #Read from file
-ahits.dt <- readDataTable("weeklyhits.csv",file_dir)
+ahits.dt <- readtext(file_name, encoding = "utf-8") 
 
 #select required columns
 ahits.dt <- ahits.dt[,.SD,.SDcols = c(3,5,6,8)]
