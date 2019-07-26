@@ -1,11 +1,12 @@
 library(readtext)
 library(tidyverse)
 library(gganimate)
+library(ggplot)
 library(data.table)
 #use geom_tile for animated bars, since it allows you to slide positions.
 
 #Read from file
-ahits.dt <- readtext(file_name, encoding = "utf-8") 
+ahits.dt <- readtext("weeklyhits.csv", encoding = "utf-8") 
 
 #select required columns
 ahits.dt <- ahits.dt[,.SD,.SDcols = c(3,5,6,8)]
